@@ -1,5 +1,6 @@
-.main_text {
+body {
     width: 750px;
     margin: 5px;
-    background-color: hsla(240,100%,50%,0.6);
+    background-color: hsla(0,0%,0%,0.6);
+    color: wheat;
 }
