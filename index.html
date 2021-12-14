@@ -8,8 +8,27 @@
         <h1>Hello World</h1>
         <p>I'm hosted with GitHub Pages.</p>
         <p>Hello my name is Eric!</p>
-        <h2>Wisdom of the day</h2>
-        <p>Teach someone to dance, and they will dance until their kneeds give out.</p>
     </div>
+    <script>
+        var stocks = new Stocks('HOW0LDN2HBFLZDA2')
+        var assets = ['XIC.TO','XIN.TO','XSP.TO','XBB.TO','CAR-UN.TO']
+        var options = {
+          symbol: 'AAPL',
+          interval: 'weekly',
+          amount: 52
+        };
+        var results = {}
+        for (a in assets) {
+            options.symbol = assets[a];
+            results[a] = stocks.timeSeries(options);
+        }
+        const test = (num) => {
+            console.log(results);
+        }
+    </script>
+    <div>
+        <h2>Hey! I'm tired</h2>
+        <button onclick="test()">Get stock data</button>
+      </div>
 </body>
 </html>
