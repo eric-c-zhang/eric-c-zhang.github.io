@@ -4,6 +4,7 @@
     <link href="./resources/css/index.css" type="text/css" rel="stylesheet">
     <script src="./resources/js/stocks.js"></script>
     <script src="./resources/js/bundle.js"></script>
+    <script src="./resources/js/math.js"></script>
 </head>
 <body>
     <ul class="nav-bar">
@@ -25,8 +26,6 @@
         };
         var cov = require( 'compute-covariance' );
         let results = {};
-        var x = [ 1, 2, 3, 4, 5 ],y = [ 5, 4, 3, 2, 1 ];
-        var mat = cov( x, y );
 
         async function getStockData(assets) {
             var stocks = new Stocks('HOW0LDN2HBFLZDA2')
@@ -39,7 +38,7 @@
         stockData = getStockData(assets);
         console.log(results);
         
-        const test = (results) => {
+        const retA = (results) => {
             var closeArray = [];
             var returnArray = [];
             for (var p in results) {
@@ -59,11 +58,83 @@
             }
             return returnArray;
         };
+        const closeP = (results) => {
+            var closeArray = [];
+            for (var p in results) {
+                tArray = [];
+                for (var d in results[p]){
+                    console.log(assets[p])
+                    tArray.push(results[p][d].close)    
+                }
+                closeArray[p] = tArray;
+            }
+            return closeArray;
+        };
+        closePrice = closeP(results);
+        returns=retA(results);
+        covmat=math.matrix(cov(returns));
+        weight = [0.2, 0.0, 0.2, 0.40, 0.2];
+        tWeight = math.transpose(weight);
+        covMarray = math.multiply(covmat,weight);
+        risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(51)
+        gradient = math.multiply(weight,covmat,51,1/risk)
+        ed = 0.05/gradient._data[0]
+        hurdle = [];
+        for (var g of gradient._data){
+            hurdle.push(ed*g)
+        } 
+        hurdle[0]=0.05
 
     </script>
-    <div>
-        <h2>Hey! I'm tired</h2>
-        <button onclick="getStockData()">Refresh stock data</button>
-      </div>
+        <div class="hurdle-rates-table">
+            <table>
+                <tr>
+                    <td>Asset Class</td>
+                    <td>"Conventional" Weight</td>
+                    <td>Mean-variance optimal implied expected return</td>
+                    <td>Weight in your portfolio</td>
+                    <td>Your mean-variance optimal implied expected return</td>
+                </tr>
+                <tr>
+                    <td>S&P 500</td>
+                    <td>20%</td>
+                    <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="5"></td>
+                    <td>20%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>S&P TSX</td>
+                    <td>20%</td>
+                    <td></td>
+                    <td>20%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>EAFE Equities</td>
+                    <td>20%</td>
+                    <td></td>
+                    <td>20%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Canadian Bond Universe</td>
+                    <td>40%</td>
+                    <td></td>
+                    <td>40%</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>Canadian Apartments Reit</td>
+                    <td>0%</td>
+                    <td></td>
+                    <td>0%</td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <button onclick="getStockData()">Refresh stock data</button>
+        </div>
+    </div>
 </body>
 </html>
