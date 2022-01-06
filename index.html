@@ -18,27 +18,20 @@
         <p>Hello my name is Eric! I`m interested in a lot of things.</p>
     </div>
     <script>
-        var assets = ['XIC.TO','XIN.TO','XSP.TO','XBB.TO','CAR-UN.TO']
+        var assets = ['XSP.TO','XIC.TO','XIN.TO','XBB.TO','CAR-UN.TO']
         var options = {
           symbol: 'AAPL',
           interval: 'weekly',
-          amount: 52
+          amount: 53
         };
         var cov = require( 'compute-covariance' );
-        let results = {};
+        var formatOption = {
+                style: 'percent',
+                maximumFractionDigits: 2
+        };
+        var covmatMain = [];
 
-        async function getStockData(assets) {
-            var stocks = new Stocks('HOW0LDN2HBFLZDA2')
-            for (a in assets) {
-                options.symbol = assets[a];
-                results[a] = await stocks.timeSeries(options);
-            }
-            return results;
-        }
-        stockData = getStockData(assets);
-        console.log(results);
-        
-        const retA = (results) => {
+        const makeReturnArray = (results) => {
             var closeArray = [];
             var returnArray = [];
             for (var p in results) {
@@ -47,7 +40,7 @@
                 for (var d in results[p]){
                     console.log(assets[p])
                     tArray.push(results[p][d].close)
-                    if (d < 51) {
+                    if (d < 52) {
                         let ld = 0;
                         ld = Number(d) + 1;                   //Latest date placed at start of array.
                         rArray.push((results[p][d].close-results[p][ld].close)/(results[p][ld].close))
@@ -58,33 +51,91 @@
             }
             return returnArray;
         };
+        
         const closeP = (results) => {
             var closeArray = [];
             for (var p in results) {
                 tArray = [];
                 for (var d in results[p]){
-                    console.log(assets[p])
                     tArray.push(results[p][d].close)    
                 }
                 closeArray[p] = tArray;
             }
             return closeArray;
         };
-        closePrice = closeP(results);
-        returns=retA(results);
-        covmat=math.matrix(cov(returns));
-        weight = [0.2, 0.0, 0.2, 0.40, 0.2];
-        tWeight = math.transpose(weight);
-        covMarray = math.multiply(covmat,weight);
-        risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(51)
-        gradient = math.multiply(weight,covmat,51,1/risk)
-        ed = 0.05/gradient._data[0]
-        hurdle = [];
-        for (var g of gradient._data){
-            hurdle.push(ed*g)
-        } 
-        hurdle[0]=0.05
 
+        const updateHurdle = () =>{
+            tWeight = math.transpose(weight);
+            risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(52)
+            gradient = math.multiply(weight,covmat,52,1/risk)
+            ed = snp500ret.value/100/gradient._data[0]
+
+            document.getElementById("conventional-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[1])
+            document.getElementById("conventional-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[2])
+            document.getElementById("conventional-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[3])
+            document.getElementById("conventional-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[4])
+
+            customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];
+            tCustomWeight = math.transpose(customWeight);
+            customRisk = math.sqrt(math.multiply(customWeight,covmatMain,tCustomWeight))*math.sqrt(52)
+            customGradient = math.multiply(customWeight,covmatMain,52,1/customRisk)
+            customEd = snp500ret.value/100/customGradient._data[0]
+            
+            document.getElementById("custom-hurdle-rate-s&p").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[0])
+            document.getElementById("custom-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[1])
+            document.getElementById("custom-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[2])
+            document.getElementById("custom-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[3])
+            document.getElementById("custom-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[4])
+            }
+
+        const getStockData = async assets => {
+            var results = [];
+            var stocks = new Stocks('HOW0LDN2HBFLZDA2')
+            for (a in assets) {
+                options.symbol = assets[a];
+                results[a] = await stocks.timeSeries(options)
+            }
+            let returnResults = results;
+            closePrice = closeP(await returnResults);
+            returns=makeReturnArray(await returnResults);
+            covmat=math.matrix(cov(returns));
+            weight = [0.2, 0.2, 0.2, 0.35, 0];
+            tWeight = math.transpose(weight);
+            risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(52)
+            gradient = math.multiply(weight,covmat,52,1/risk)
+            ed = snp500ret.value/100/gradient._data[0]
+            hurdle = [];
+            for (var g of gradient._data){
+                hurdle.push(ed*g);
+            } 
+            hurdle[0]=snp500ret.value/100;
+            console.log(hurdle);        
+            console.log(returns);
+            document.getElementById("conventional-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[1])
+            document.getElementById("conventional-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[2])
+            document.getElementById("conventional-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[3])
+            document.getElementById("conventional-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[4])
+
+            customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];
+            tCustomWeight = math.transpose(customWeight);
+            customRisk = math.sqrt(math.multiply(customWeight,covmat,tCustomWeight))*math.sqrt(52)
+            customGradient = math.multiply(customWeight,covmat,52,1/customRisk)
+            customEd = snp500ret.value/100/customGradient._data[0]
+
+            document.getElementById("custom-hurdle-rate-s&p").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[0])            
+            document.getElementById("custom-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[1])
+            document.getElementById("custom-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[2])
+            document.getElementById("custom-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[3])
+            document.getElementById("custom-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[4])
+            
+            covmatMain = covmat;
+
+            return gradient._data;
+        }
+
+        var hurdleGradient=getStockData(assets)
+
+    
     </script>
         <div class="hurdle-rates-table">
             <table>
@@ -92,43 +143,43 @@
                     <td>Asset Class</td>
                     <td>"Conventional" Weight</td>
                     <td>Mean-variance optimal implied expected return</td>
-                    <td>Weight in your portfolio</td>
+                    <td>Weight in your portfolio (%)</td>
                     <td>Your mean-variance optimal implied expected return</td>
                 </tr>
                 <tr>
                     <td>S&P 500</td>
                     <td>20%</td>
                     <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="5"></td>
-                    <td>20%</td>
-                    <td></td>
+                    <td><input type="number" id="snp500w" name="snp500w" min="0" max="100" step="1" value="20"></td>
+                    <td id="custom-hurdle-rate-s&p"></td>
                 </tr>
                 <tr>
                     <td>S&P TSX</td>
                     <td>20%</td>
-                    <td></td>
-                    <td>20%</td>
-                    <td></td>
+                    <td id="conventional-hurdle-rate-s&ptsx"></td>
+                    <td><input type="number" id="w1" name="w1" min="0" max="100" step="1" value="20"></td>
+                    <td id="custom-hurdle-rate-s&ptsx"></td>
                 </tr>
                 <tr>
                     <td>EAFE Equities</td>
                     <td>20%</td>
-                    <td></td>
-                    <td>20%</td>
-                    <td></td>
+                    <td id="conventional-hurdle-rate-eafe"></td>
+                    <td><input type="number" id="w2" name="w2" min="0" max="100" step="1" value="20"></td>
+                    <td id="custom-hurdle-rate-eafe"></td>
                 </tr>
                 <tr>
                     <td>Canadian Bond Universe</td>
                     <td>40%</td>
-                    <td></td>
-                    <td>40%</td>
-                    <td></td>
+                    <td id="conventional-hurdle-rate-canadianbonds"></td>
+                    <td><input type="number" id="w3" name="w3" min="0" max="100" step="1" value="35"></td>
+                    <td id="custom-hurdle-rate-canadianbonds"></td>
                 </tr>
                 <tr>
                     <td>Canadian Apartments Reit</td>
                     <td>0%</td>
-                    <td></td>
-                    <td>0%</td>
-                    <td></td>
+                    <td id="conventional-hurdle-rate-careit"></td>
+                    <td><input type="number" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
+                    <td id="custom-hurdle-rate-careit"></td>
                 </tr>
             </table>
         </div>
@@ -136,5 +187,13 @@
             <button onclick="getStockData()">Refresh stock data</button>
         </div>
     </div>
+    <script>
+        snp500ret.addEventListener('change',updateHurdle)
+        snp500w.addEventListener('change',updateHurdle)
+        w1.addEventListener('change',updateHurdle)
+        w2.addEventListener('change',updateHurdle)
+        w3.addEventListener('change',updateHurdle)
+        w4.addEventListener('change',updateHurdle)
+</script>
 </body>
 </html>

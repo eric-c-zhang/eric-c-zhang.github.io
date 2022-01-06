@@ -1,4 +1,4 @@
-const returnarray = (results) => {
+const makeReturnArray = (results) => {
     var closeArray = [];
     var returnArray = [];
     for (var p in results) {
