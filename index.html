@@ -9,13 +9,10 @@
 <body>
     <ul class="nav-bar">
         <li><a href="">Home</a></li>
-        <li><a href="">Projects</a></li>
-        <li><a href="">Contact</a></li>
-        <li><a href="">About</a></li>
     </ul>
     <div class="main_text">
         <h1>Hello World</h1>
-        <p>Hello my name is Eric! I`m interested in a lot of things.</p>
+        <p>Hello my name is Eric! I`m interested in a lot of things. One of those things is below:</p>
     </div>
     <script>
         var assets = ['XSP.TO','XIC.TO','XIN.TO','XBB.TO','CAR-UN.TO']
@@ -138,18 +135,22 @@
     
     </script>
         <div class="hurdle-rates-table">
+            <h2>Expected Returns Calculator</h2>
+            <h3>How this works</h3>
+            <p>This calculator takes a set of investible indices, weights of those indices inside a portfolio, and some portfolio assumptions (see below) to back out the Expected Returns assumptions behind that portfolio.</p>  
+            <P>I calculate a set of expected returns for a "conventional" or "60/40 Equities/Bonds" investment portfolio in the 3rd column. You can supply different weights of the same investible indices, and compare how your expected returns differ.</P>
             <table>
                 <tr>
-                    <td>Asset Class</td>
+                    <td>Asset Class / Investible Index</td>
                     <td>"Conventional" Weight</td>
-                    <td>Mean-variance optimal implied expected return</td>
+                    <td>"Conventional" Expected Return</td>
                     <td>Weight in your portfolio (%)</td>
-                    <td>Your mean-variance optimal implied expected return</td>
+                    <td>Your Expected Return</td>
                 </tr>
                 <tr>
                     <td>S&P 500</td>
                     <td>20%</td>
-                    <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="5"></td>
+                    <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="5.00"></td>
                     <td><input type="number" id="snp500w" name="snp500w" min="0" max="100" step="1" value="20"></td>
                     <td id="custom-hurdle-rate-s&p"></td>
                 </tr>
@@ -187,6 +188,9 @@
             <button onclick="getStockData()">Refresh stock data</button>
         </div>
     </div>
+    <h3>How this works (long version)</h3>
+    <p>This calculator assumes that any assets in any "optimal" portfolio must have the same ratio of expected returns to marginal increase in risk("ER/MCR" ratio). If this ratio is different for different assets, you can change the weight of any asset to increase total portfolio expected returns or portfolio risk.</p>
+    <p>We back out the expected returns of particular assets in the portfolio by calculating the ER/MCR ratio for one asset (in this case S&P 500) with an assumed risk premium (in this case, 5%; you can change this). Then we equalize the ER/MCR ratio for all assets, and back out their expected returns by multiplying those ratios by their individual MCR values.</p>
     <script>
         snp500ret.addEventListener('change',updateHurdle)
         snp500w.addEventListener('change',updateHurdle)
