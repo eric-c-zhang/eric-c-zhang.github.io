@@ -3,14 +3,14 @@ a:link {
 }
 
 a:visited {
-    color: lightseagreen;
+    color: lightpink;
 }
 
 body {
     width: 100%;
     margin: 5px;
-    background-color: hsla(0,0%,0%,0.6);
-    color: wheat;
+    background-color: hsl(232, 41%, 52%);
+    color: white;
 }
 
 html {
@@ -24,7 +24,7 @@ html {
     width: 100%;
     padding: 0;
     overflow: hidden;
-    background-color: #dddddd;
+    background-color: indigo;
 }
 
 .nav-bar li {
@@ -34,7 +34,7 @@ html {
 .nav-bar li a {
     display: block; 
     padding: 8px;
-    background-color: #dddddd;
+    background-color: indigo;
     text-decoration: none;
     text-align: center;
 }
