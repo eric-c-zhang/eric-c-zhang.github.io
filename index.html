@@ -28,6 +28,11 @@
         };
         var covmatMain = [];
 
+        const url='https://deploy-back-end-example.herokuapp.com/matrix'
+        const remoteMat = fetch(url)
+        .then(data=>{return data.json})
+        .then(res=>{console.log(res)})
+
         const makeReturnArray = (results) => {
             var closeArray = [];
             var returnArray = [];
