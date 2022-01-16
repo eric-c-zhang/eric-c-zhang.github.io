@@ -26,11 +26,14 @@
                 style: 'percent',
                 maximumFractionDigits: 2
         };
-        var covmatMain = [];
+        var covmatMain = {};
+        var remoteMat = {}
 
+        //Fetch static covariance matrix from API
         const url='https://deploy-back-end-example.herokuapp.com/matrix'
-        const remoteMat = fetch(url)
-        .then(data=>{return data.json})
+        fetch(url)
+        .then(data=>{return data.json()})
+        .then(data=>{remoteMat=math.matrix(data.data)})
         .then(res=>{console.log(res)})
 
         const makeReturnArray = (results) => {
@@ -91,6 +94,8 @@
             }
 
         const getStockData = async assets => {
+
+            //Download stock data
             var results = [];
             var stocks = new Stocks('HOW0LDN2HBFLZDA2')
             for (a in assets) {
@@ -101,6 +106,12 @@
             closePrice = closeP(await returnResults);
             returns=makeReturnArray(await returnResults);
             covmat=math.matrix(cov(returns));
+
+            //Use the static matrix from the Heroku server if possible
+            console.log(remoteMat)
+            if (remoteMat !== undefined) {
+                covmat = remoteMat;
+            }
             weight = [0.2, 0.2, 0.2, 0.35, 0];
             tWeight = math.transpose(weight);
             risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(52)
@@ -137,7 +148,6 @@
 
         var hurdleGradient=getStockData(assets)
 
-    
     </script>
         <div class="hurdle-rates-table">
             <h2>Expected Returns Calculator</h2>
