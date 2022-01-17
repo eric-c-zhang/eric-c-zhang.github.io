@@ -37,7 +37,7 @@
                 <tr>
                     <td>S&P 500</td>
                     <td>20%</td>
-                    <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="5.00"></td>
+                    <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="8.00"></td>
                     <td><input type="number" id="snp500w" name="snp500w" min="0" max="100" step="1" value="20"></td>
                     <td id="custom-hurdle-rate-s&p"></td>
                 </tr>
@@ -68,6 +68,13 @@
                     <td id="conventional-hurdle-rate-careit"></td>
                     <td><input type="number" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
                     <td id="custom-hurdle-rate-careit"></td>
+                </tr>
+                <tr>
+                    <td>Total Portfolio</td>
+                    <td></td>
+                    <td id="conventional-total-rate"></td>
+                    <td></td>
+                    <td id="custom-total-rate"></td>
                 </tr>
             </table>
         </div>
@@ -112,7 +119,7 @@
         <li><a href="https://mathjs.org/index.html">math.js</a> to perform matrix algebra</li>
     </ul>
     <script>
-                var assets = ['XSP.TO','XIC.TO','XIN.TO','XBB.TO','CAR-UN.TO']
+        var assets = ['XSP.TO','XIC.TO','XIN.TO','XBB.TO','CAR-UN.TO']
         var options = {
           symbol: 'AAPL',
           interval: 'weekly',
@@ -121,7 +128,8 @@
         var cov = require( 'compute-covariance' );
         var formatOption = {
                 style: 'percent',
-                maximumFractionDigits: 2
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
         };
         var covmatMain = {};
         var remoteMat = {}
@@ -152,37 +160,29 @@
         const updateHurdle = () => {
             let weight = [0.2, 0.2, 0.2, 0.35, 0];
             let customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];        
-            portConventional = portfolioRisk(covmatMain,snp500ret.value,weight,52,100)
-            portCustom = portfolioRisk(covmatMain,snp500ret.value,customWeight,52,100)
 
             elements1 = conventionalReturnElements;
             elements2 = customReturnElements;
-            port1 = portConventional;
-            port2 = portCustom;
+            port1 = portfolioRisk(covmatMain,snp500ret.value,weight,52,100);
+            port2 = portfolioRisk(covmatMain,snp500ret.value,customWeight,52,100);
 
-            let conventionalGradient = port1.ERMCratios._data.slice(1)
             for (var e in elements1) {
                 document.getElementById(elements1[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port1.anchorERMC*port1.ERMCratios._data.slice(1)[e])
             }
+            document.getElementById("conventional-total-rate").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port1.portfolioExpectedReturn);
+            
             for (var e in elements2) {
                 document.getElementById(elements2[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port2.anchorERMC*port2.ERMCratios._data[e])
             }
+            document.getElementById("custom-total-rate").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port2.portfolioExpectedReturn);
+
         }
 
         getMatrixData(assets)
         .then(matrix=>{
             covmatMain=matrix
-            portConventional = portfolioRisk(covmatMain,snp500ret.value,weight,52,100)
-            portCustom = portfolioRisk(covmatMain,snp500ret.value,customWeight,52,100)
-            let conventionalGradient = portConventional.ERMCratios._data.slice(1)
-            for (var e in conventionalReturnElements) {
-                document.getElementById(conventionalReturnElements[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(portConventional.anchorERMC*portConventional.ERMCratios._data.slice(1)[e])
-            }
-
-            for (var e in customReturnElements) {
-                document.getElementById(customReturnElements[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(portCustom.anchorERMC*portCustom.ERMCratios._data[e])
-            }
-            console.log(conventionalReturnElements,customReturnElements,portConventional,portCustom)
+            updateHurdle();
+                        
             snp500ret.addEventListener('change',updateHurdle)
             snp500w.addEventListener('change',updateHurdle)
             w1.addEventListener('change',updateHurdle)
