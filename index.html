@@ -7,6 +7,10 @@
     <script src="./resources/js/stocks.js"></script>
     <script src="./resources/js/bundle.js"></script>
     <script src="./resources/js/math.js"></script>
+    <script src="./resources/js/closeprice.js"></script>
+    <script src="./resources/js/makereturnarray.js"></script>
+    <script src="./resources/js/portfoliorisk.js"></script>
+    <script src="./resources/js/getmatrixdata.js"></script>
 </head>
 <body>
     <ul class="nav-bar">
@@ -16,141 +20,6 @@
         <h1>Hello World</h1>
         <p>Hello my name is Eric! I`m interested in a lot of things. One of those things is below:</p>
     </div>
-    <script>
-        var assets = ['XSP.TO','XIC.TO','XIN.TO','XBB.TO','CAR-UN.TO']
-        var options = {
-          symbol: 'AAPL',
-          interval: 'weekly',
-          amount: 53
-        };
-        var cov = require( 'compute-covariance' );
-        var formatOption = {
-                style: 'percent',
-                maximumFractionDigits: 2
-        };
-        var covmatMain = {};
-        var remoteMat = {}
-
-        //Fetch static covariance matrix from API
-        const url='https://deploy-back-end-example.herokuapp.com/matrix'
-        fetch(url)
-        .then(data=>{return data.json()})
-        .then(data=>{remoteMat=math.matrix(data.data)})
-        .then(res=>{console.log(res)})
-
-        const makeReturnArray = (results) => {
-            var closeArray = [];
-            var returnArray = [];
-            for (var p in results) {
-                tArray = [];
-                rArray = [];
-                for (var d in results[p]){
-                    console.log(assets[p])
-                    tArray.push(results[p][d].close)
-                    if (d < 52) {
-                        let ld = 0;
-                        ld = Number(d) + 1;                   //Latest date placed at start of array.
-                        rArray.push((results[p][d].close-results[p][ld].close)/(results[p][ld].close))
-                    }
-                };
-                closeArray[p] = tArray;
-                returnArray[p] = rArray;
-            }
-            return returnArray;
-        };
-        
-        const closeP = (results) => {
-            var closeArray = [];
-            for (var p in results) {
-                tArray = [];
-                for (var d in results[p]){
-                    tArray.push(results[p][d].close)    
-                }
-                closeArray[p] = tArray;
-            }
-            return closeArray;
-        };
-
-        const updateHurdle = () =>{
-            tWeight = math.transpose(weight);
-            risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(52)
-            gradient = math.multiply(weight,covmat,52,1/risk)
-            ed = snp500ret.value/100/gradient._data[0]
-
-            document.getElementById("conventional-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[1])
-            document.getElementById("conventional-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[2])
-            document.getElementById("conventional-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[3])
-            document.getElementById("conventional-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[4])
-
-            customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];
-            tCustomWeight = math.transpose(customWeight);
-            customRisk = math.sqrt(math.multiply(customWeight,covmatMain,tCustomWeight))*math.sqrt(52)
-            customGradient = math.multiply(customWeight,covmatMain,52,1/customRisk)
-            customEd = snp500ret.value/100/customGradient._data[0]
-            
-            document.getElementById("custom-hurdle-rate-s&p").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[0])
-            document.getElementById("custom-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[1])
-            document.getElementById("custom-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[2])
-            document.getElementById("custom-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[3])
-            document.getElementById("custom-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[4])
-            }
-
-        const getStockData = async assets => {
-
-            //Download stock data
-            var results = [];
-            var stocks = new Stocks('HOW0LDN2HBFLZDA2')
-            for (a in assets) {
-                options.symbol = assets[a];
-                results[a] = await stocks.timeSeries(options)
-            }
-            let returnResults = results;
-            closePrice = closeP(await returnResults);
-            returns=makeReturnArray(await returnResults);
-            covmat=math.matrix(cov(returns));
-
-            //Use the static matrix from the Heroku server if possible
-            console.log(remoteMat)
-            if (remoteMat !== undefined) {
-                covmat = remoteMat;
-            }
-            weight = [0.2, 0.2, 0.2, 0.35, 0];
-            tWeight = math.transpose(weight);
-            risk = math.sqrt(math.multiply(weight,covmat,tWeight))*math.sqrt(52)
-            gradient = math.multiply(weight,covmat,52,1/risk)
-            ed = snp500ret.value/100/gradient._data[0]
-            hurdle = [];
-            for (var g of gradient._data){
-                hurdle.push(ed*g);
-            } 
-            hurdle[0]=snp500ret.value/100;
-            console.log(hurdle);        
-            console.log(returns);
-            document.getElementById("conventional-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[1])
-            document.getElementById("conventional-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[2])
-            document.getElementById("conventional-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[3])
-            document.getElementById("conventional-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(ed*gradient._data[4])
-
-            customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];
-            tCustomWeight = math.transpose(customWeight);
-            customRisk = math.sqrt(math.multiply(customWeight,covmat,tCustomWeight))*math.sqrt(52)
-            customGradient = math.multiply(customWeight,covmat,52,1/customRisk)
-            customEd = snp500ret.value/100/customGradient._data[0]
-
-            document.getElementById("custom-hurdle-rate-s&p").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[0])            
-            document.getElementById("custom-hurdle-rate-s&ptsx").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[1])
-            document.getElementById("custom-hurdle-rate-eafe").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[2])
-            document.getElementById("custom-hurdle-rate-canadianbonds").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[3])
-            document.getElementById("custom-hurdle-rate-careit").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(customEd*customGradient._data[4])
-            
-            covmatMain = covmat;
-
-            return gradient._data;
-        }
-
-        var hurdleGradient=getStockData(assets)
-
-    </script>
         <div class="hurdle-rates-table">
             <h2>Expected Returns Calculator</h2>
             <h3>How this works</h3>
@@ -243,12 +112,85 @@
         <li><a href="https://mathjs.org/index.html">math.js</a> to perform matrix algebra</li>
     </ul>
     <script>
-        snp500ret.addEventListener('change',updateHurdle)
-        snp500w.addEventListener('change',updateHurdle)
-        w1.addEventListener('change',updateHurdle)
-        w2.addEventListener('change',updateHurdle)
-        w3.addEventListener('change',updateHurdle)
-        w4.addEventListener('change',updateHurdle)
-</script>
+                var assets = ['XSP.TO','XIC.TO','XIN.TO','XBB.TO','CAR-UN.TO']
+        var options = {
+          symbol: 'AAPL',
+          interval: 'weekly',
+          amount: 53
+        };
+        var cov = require( 'compute-covariance' );
+        var formatOption = {
+                style: 'percent',
+                maximumFractionDigits: 2
+        };
+        var covmatMain = {};
+        var remoteMat = {}
+        const conventionalReturnElements = [
+                "conventional-hurdle-rate-s&ptsx",
+                "conventional-hurdle-rate-eafe",
+                "conventional-hurdle-rate-canadianbonds",
+                "conventional-hurdle-rate-careit"
+        ];
+        const customReturnElements = [
+                "custom-hurdle-rate-s&p",
+                "custom-hurdle-rate-s&ptsx",
+                "custom-hurdle-rate-eafe",
+                "custom-hurdle-rate-canadianbonds",
+                "custom-hurdle-rate-careit"
+        ];
+
+        let weight = [0.2, 0.2, 0.2, 0.35, 0];
+        let customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];        
+
+        //Fetch static covariance matrix from API
+        const url='https://deploy-back-end-example.herokuapp.com/matrix'
+        fetch(url)
+        .then(data=>{return data.json()})
+        .then(data=>{remoteMat=math.matrix(data.data)})
+        .then(res=>{console.log(res)})
+
+        const updateHurdle = () => {
+            let weight = [0.2, 0.2, 0.2, 0.35, 0];
+            let customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];        
+            portConventional = portfolioRisk(covmatMain,snp500ret.value,weight,52,100)
+            portCustom = portfolioRisk(covmatMain,snp500ret.value,customWeight,52,100)
+
+            elements1 = conventionalReturnElements;
+            elements2 = customReturnElements;
+            port1 = portConventional;
+            port2 = portCustom;
+
+            let conventionalGradient = port1.ERMCratios._data.slice(1)
+            for (var e in elements1) {
+                document.getElementById(elements1[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port1.anchorERMC*port1.ERMCratios._data.slice(1)[e])
+            }
+            for (var e in elements2) {
+                document.getElementById(elements2[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port2.anchorERMC*port2.ERMCratios._data[e])
+            }
+        }
+
+        getMatrixData(assets)
+        .then(matrix=>{
+            covmatMain=matrix
+            portConventional = portfolioRisk(covmatMain,snp500ret.value,weight,52,100)
+            portCustom = portfolioRisk(covmatMain,snp500ret.value,customWeight,52,100)
+            let conventionalGradient = portConventional.ERMCratios._data.slice(1)
+            for (var e in conventionalReturnElements) {
+                document.getElementById(conventionalReturnElements[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(portConventional.anchorERMC*portConventional.ERMCratios._data.slice(1)[e])
+            }
+
+            for (var e in customReturnElements) {
+                document.getElementById(customReturnElements[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(portCustom.anchorERMC*portCustom.ERMCratios._data[e])
+            }
+            console.log(conventionalReturnElements,customReturnElements,portConventional,portCustom)
+            snp500ret.addEventListener('change',updateHurdle)
+            snp500w.addEventListener('change',updateHurdle)
+            w1.addEventListener('change',updateHurdle)
+            w2.addEventListener('change',updateHurdle)
+            w3.addEventListener('change',updateHurdle)
+            w4.addEventListener('change',updateHurdle)
+        })
+
+    </script>
 </body>
 </html>

@@ -9,7 +9,7 @@ a:visited {
 body {
     width: 100%;
     margin: 5px;
-    background-color: hsl(232, 41%, 52%);
+    background-color: #18141c;
     color: white;
 }
 
@@ -24,7 +24,7 @@ html {
     width: 100%;
     padding: 0;
     overflow: hidden;
-    background-color: indigo;
+    background-color: hsl(232, 41%, 52%);;
 }
 
 .nav-bar li {
@@ -34,7 +34,7 @@ html {
 .nav-bar li a {
     display: block; 
     padding: 8px;
-    background-color: indigo;
+    background-color:hsl(232, 41%, 52%);
     text-decoration: none;
     text-align: center;
 }
