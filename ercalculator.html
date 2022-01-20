@@ -53,110 +53,114 @@
         </div>
     </div>
         <div class="container-lg">
-            <table class="table table-success table-hover table-bordered table-sm table-striped">
-                <thead class="table-success">
-                    <tr>
-                        <th scope="col">Asset Class / Investible Index</th>
-                        <th scope="col">"Conventional" Weight</th>
-                        <th scope="col">"Conventional" Expected Return</th>
-                        <th scope="col">Weight in your portfolio (%)</th>
-                        <th scope="col">Your Expected Return</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">S&P 500</th>
-                        <td>20%</td>
-                        <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="8.00"></td>
-                        <td><input type="number" id="snp500w" name="snp500w" min="0" max="100" step="1" value="20"></td>
-                        <td id="custom-hurdle-rate-s&p"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">S&P TSX</th>
-                        <td>20%</td>
-                        <td id="conventional-hurdle-rate-s&ptsx"></td>
-                        <td><input type="number" id="w1" name="w1" min="0" max="100" step="1" value="20"></td>
-                        <td id="custom-hurdle-rate-s&ptsx"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">EAFE Equities</th>
-                        <td>20%</td>
-                        <td id="conventional-hurdle-rate-eafe"></td>
-                        <td><input type="number" id="w2" name="w2" min="0" max="100" step="1" value="20"></td>
-                        <td id="custom-hurdle-rate-eafe"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Canadian Bond Universe</th>
-                        <td>40%</td>
-                        <td id="conventional-hurdle-rate-canadianbonds"></td>
-                        <td><input type="number" id="w3" name="w3" min="0" max="100" step="1" value="35"></td>
-                        <td id="custom-hurdle-rate-canadianbonds"></td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Canadian Apartments Reit</th>
-                        <td>0%</td>
-                        <td id="conventional-hurdle-rate-careit"></td>
-                        <td><input type="number" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
-                        <td id="custom-hurdle-rate-careit"></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th scope="row">Total Portfolio</th>
-                        <td></td>
-                        <td id="conventional-total-rate"></td>
-                        <td></td>
-                        <td id="custom-total-rate"></td>
-                    </tr>
-                </tfoot>
-            </table>
-        <a href="#sidebar" class="d-block mt-3" data-bs-toggle="offcanvas" role="button" aria-controls="sidebar">
-            How this works (long version)
-        </a>    
-            <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebar-label">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="sidebar-label">How this work (long version)</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <p>
-                        This calculator follows the logic outlined in 
-                        <a href="https://www.amazon.ca/Modern-Investment-Management-Equilibrium-Approach/dp/0471124109">
-                        "Modern Investment Management: An Equilibrium Approach"</a> by Bob Litterman.
-                        It assumes that any assets in any "optimal" portfolio must have the same ratio
-                        of expected returns to marginal increase in risk ("ER/MCR" ratio). If this ratio is different
-                        for different assets, you can change the weight of any asset to increase total portfolio
-                        expected returns or portfolio risk.
-                    </p>
-                    <p>
-                        We back out the expected returns of particular assets in the portfolio by calculating the
-                        ER/MCR ratio for one asset (in this case S&P 500) with an assumed risk premium (in this case,
-                        5%; you can change this). Then we equalize the ER/MCR ratio for all assets, and back out
-                        their expected returns by multiplying those ratios by their individual MCR values.</p>
-                    <h4>Key Assumptions:</h4>
-                    <ul>
-                        <li>
-                            You only care about returns and risk (standard deviation of risk) in an "optimal" 
-                            portfolio
-                        </li>
-                        <li>
-                            Recent historical returns (unweighted data from last 52 weeks) are adequte to estimate
-                            marginal increase in portfolio risk
-                        </li>
-                        <li>
-                            We can use the historical covariance matrix as the risk model to estimate marginal 
-                            increase in portfolio risk
-                        </li>
-                        <li>
-                            The initial expected return we supplied (S&P 500) is relatively accurate
-                        </li>
-                    </ul>
-                    <h4>Technologies used:</h4>
-                    <ul>
-                        <li><a href="https://github.com/wagenaartje/stocks.js">stock.js</a> to download securities data</li>
-                        <li><a href="https://github.com/compute-io/covariance">compute-covariance</a> to compute covariance matrices</li>
-                        <li><a href="https://mathjs.org/index.html">math.js</a> to perform matrix algebra</li>
-                    </ul>
+            <div class="row justify-center">
+                <div class="col-md-10 text-center text-md-start">
+                    <table class="table table-success table-hover table-bordered table-sm table-striped">
+                        <thead class="table-success">
+                            <tr>
+                                <th scope="col">Asset Class / Investible Index</th>
+                                <th scope="col">"Conventional" Weight</th>
+                                <th scope="col">"Conventional" Expected Return</th>
+                                <th scope="col">Weight in your portfolio (%)</th>
+                                <th scope="col">Your Expected Return</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">S&P 500</th>
+                                <td>20%</td>
+                                <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="8.00"></td>
+                                <td><input type="number" id="snp500w" name="snp500w" min="0" max="100" step="1" value="20"></td>
+                                <td id="custom-hurdle-rate-s&p"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">S&P TSX</th>
+                                <td>20%</td>
+                                <td id="conventional-hurdle-rate-s&ptsx"></td>
+                                <td><input type="number" id="w1" name="w1" min="0" max="100" step="1" value="20"></td>
+                                <td id="custom-hurdle-rate-s&ptsx"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">EAFE Equities</th>
+                                <td>20%</td>
+                                <td id="conventional-hurdle-rate-eafe"></td>
+                                <td><input type="number" id="w2" name="w2" min="0" max="100" step="1" value="20"></td>
+                                <td id="custom-hurdle-rate-eafe"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Canadian Bond Universe</th>
+                                <td>40%</td>
+                                <td id="conventional-hurdle-rate-canadianbonds"></td>
+                                <td><input type="number" id="w3" name="w3" min="0" max="100" step="1" value="35"></td>
+                                <td id="custom-hurdle-rate-canadianbonds"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Canadian Apartments Reit</th>
+                                <td>0%</td>
+                                <td id="conventional-hurdle-rate-careit"></td>
+                                <td><input type="number" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
+                                <td id="custom-hurdle-rate-careit"></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th scope="row">Total Portfolio</th>
+                                <td></td>
+                                <td id="conventional-total-rate"></td>
+                                <td></td>
+                                <td id="custom-total-rate"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <a href="#sidebar" class="d-block mt-3" data-bs-toggle="offcanvas" role="button" aria-controls="sidebar">
+                        How this works (long version)
+                    </a>    
+                    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebar-label">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="sidebar-label">How this work (long version)</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="offcanvas-body">
+                            <p>
+                                This calculator follows the logic outlined in 
+                                <a href="https://www.amazon.ca/Modern-Investment-Management-Equilibrium-Approach/dp/0471124109">
+                                "Modern Investment Management: An Equilibrium Approach"</a> by Bob Litterman.
+                                It assumes that any assets in any "optimal" portfolio must have the same ratio
+                                of expected returns to marginal increase in risk ("ER/MCR" ratio). If this ratio is different
+                                for different assets, you can change the weight of any asset to increase total portfolio
+                                expected returns or portfolio risk.
+                            </p>
+                            <p>
+                                We back out the expected returns of particular assets in the portfolio by calculating the
+                                ER/MCR ratio for one asset (in this case S&P 500) with an assumed risk premium (in this case,
+                                5%; you can change this). Then we equalize the ER/MCR ratio for all assets, and back out
+                                their expected returns by multiplying those ratios by their individual MCR values.</p>
+                            <h4>Key Assumptions:</h4>
+                            <ul>
+                                <li>
+                                    You only care about returns and risk (standard deviation of risk) in an "optimal" 
+                                    portfolio
+                                </li>
+                                <li>
+                                    Recent historical returns (unweighted data from last 52 weeks) are adequte to estimate
+                                    marginal increase in portfolio risk
+                                </li>
+                                <li>
+                                    We can use the historical covariance matrix as the risk model to estimate marginal 
+                                    increase in portfolio risk
+                                </li>
+                                <li>
+                                    The initial expected return we supplied (S&P 500) is relatively accurate
+                                </li>
+                            </ul>
+                            <h4>Technologies used:</h4>
+                            <ul>
+                                <li><a href="https://github.com/wagenaartje/stocks.js">stock.js</a> to download securities data</li>
+                                <li><a href="https://github.com/compute-io/covariance">compute-covariance</a> to compute covariance matrices</li>
+                                <li><a href="https://mathjs.org/index.html">math.js</a> to perform matrix algebra</li>
+                            </ul>
+                            </div>
+                    </div>    
                 </div>
             </div>
         </div>
