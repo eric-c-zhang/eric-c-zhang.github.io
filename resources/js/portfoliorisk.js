@@ -9,13 +9,15 @@ const portfolioRisk = (COVmatrix,firstReturn,weight,periods,scaler) => {
         hurdleRateArray.push(anchorERMC*ERMCratio._data[g]);
         portfolioExpectedReturn += anchorERMC*ERMCratio._data[g]*weight[g]
     } 
+    portWeight = weight.reduce((partial_sum, a) => partial_sum + a, 0);
 
     portfolioRisk = {
         risk: risk,
         ERMCratios: ERMCratio,
         anchorERMC: anchorERMC,
         hurdleRateArray: hurdleRateArray,
-        portfolioExpectedReturn: portfolioExpectedReturn
+        portfolioExpectedReturn: portfolioExpectedReturn,
+        portfolioWeight: portWeight
     }
     
     return portfolioRisk;

@@ -52,11 +52,11 @@
             </div>
         </div>
     </div>
-        <div class="container-lg">
+        <div class="container-lg overflow-hidden">
             <div class="row justify-center align-top">
                 <div class="col-md-10 text-center small">
                     <table class="table table-success table-hover table-bordered table-sm table-striped small">
-                        <thead class="table-success">
+                        <thead class="table-success align-top">
                             <tr>
                                 <th scope="col">Investment</th>
                                 <th scope="col">"60/40" Weight (%)</th>
@@ -69,7 +69,7 @@
                             <tr>
                                 <th scope="row">S&P 500</th>
                                 <td>20%</td>
-                                <td><input type="number" class="text-center" id="snp500ret" name="snp500ret" step="0.01" value="8.00"></td>                                  
+                                <td><input type="number" class="text-center" id="snp500ret" min="0" max="100" name="snp500ret" step="0.01" value="8.00"></td>                                  
                                 <td><input type="number" class="text-center" id="snp500w" min="0" max="100" name="snp500w" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-s&p"></td>
                             </tr>
@@ -91,23 +91,23 @@
                                 <th scope="row">Canadian Bond Universe</th>
                                 <td>40%</td>
                                 <td id="conventional-hurdle-rate-canadianbonds"></td>
-                                <td><input type="number" class="text-center" id="w3" name="w3" min="0" max="100" step="1" value="35"></td>
+                                <td><input type="number" class="text-center fixed" id="w3" min="0" max="100" name="w3" step="1" value="35"></td>
                                 <td id="custom-hurdle-rate-canadianbonds"></td>
                             </tr>
                             <tr>
                                 <th scope="row">Canadian Apartments Reit</th>
                                 <td>0%</td>
                                 <td id="conventional-hurdle-rate-careit"></td>
-                                <td><input type="number" class="text-center" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
+                                <td><input type="number" class="text-center" id="w4" name="w4" size="3" min="0" max="100" step="1" value="5"></td>
                                 <td id="custom-hurdle-rate-careit"></td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
                                 <th scope="row">Total Portfolio</th>
-                                <td></td>
+                                <td>100%</td>
                                 <td id="conventional-total-rate"></td>
-                                <td></td>
+                                <td id="custom-total-weight"></td>
                                 <td id="custom-total-rate"></td>
                             </tr>
                         </tfoot>
@@ -220,21 +220,42 @@
         .then(res=>{console.log(res)})
 
         //Remove min-max attributes to prevent resizing
+        //snp500ret.removeAttribute("min")
+        //snp500ret.removeAttribute("max")
+        
         for (var e of weightInputElements) {
-            e.removeAttribute("min");
-            e.removeAttribute("max");
+         //   e.removeAttribute("min");
+          //  e.removeAttribute("max");
         };
 
         const enforceConstraints = () => {
             elements1 = conventionalReturnElements;
             elements2 = customReturnElements;
 
+            //Anchor expected return always positive
+            if (snp500ret.value < 0) {
+                snp500ret.value = 0;
+                snp500ret.blur();
+            }
+
             if (noShorting.checked === true) {
-                for (var e in weightInputElements) {
-                    if (e.value <= 0) {
+                for (var e of weightInputElements) {
+                    if (e.value < 0) {
                         e.value = 0;
+                        e.blur();
                     }
                 }
+            }
+            var leverage = 0;
+            if (noLeverage.checked === true) {
+                for (var e of weightInputElements) {
+                    leverage += Number(e.value);
+                    console.log(leverage);
+                    if (leverage > 100) {
+                        weightInputElements.forEach(e1 => e1.value=0);
+                    }
+                }
+                leverage = 0;
             }
         }
 
@@ -256,20 +277,21 @@
                 document.getElementById(elements2[e]).innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port2.anchorERMC*port2.ERMCratios._data[e])
             }
             document.getElementById("custom-total-rate").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port2.portfolioExpectedReturn);
-
+            document.getElementById("custom-total-weight").innerHTML=Intl.NumberFormat("en-CA",formatOption).format(port2.portfolioWeight);
         }
 
         getMatrixData(assets)
         .then(matrix=>{
             covmatMain=matrix
-            updateHurdle();
-                        
-            snp500ret.addEventListener('input',() => {updateHurdle();weightInputElements();})
-            snp500w.addEventListener('input',[updateHurdle,weightInputElements])
-            w1.addEventListener('input',updateHurdle)
-            w2.addEventListener('input',updateHurdle)
-            w3.addEventListener('input',updateHurdle)
-            w4.addEventListener('input',updateHurdle)
+            updateHurdle();         
+            snp500ret.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            snp500w.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            w1.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            w2.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            w3.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            w4.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            noShorting.addEventListener('input',() => {enforceConstraints();updateHurdle();})
+            noLeverage.addEventListener('input',() => {enforceConstraints();updateHurdle();})
         })
 
     </script>
