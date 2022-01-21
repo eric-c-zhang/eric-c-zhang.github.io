@@ -47,13 +47,13 @@
                     This calculator takes a set of investments, weights of those indices inside
                     a portfolio, an intial expected return forecast and some portfolio assumptions 
                     (see below) to back out the Expected Returns assumptions behind that portfolio.
+                    <br><b class="h6">*None of this is investing advice.*</b></br>    
                 </P>
-                <p><bold>*WARNING*</bold> None of this is investing advice. Forecasting and calculating expected returns is a notoriously difficult process; the results from the calculator below are only valid under certain assumptions (see below).</p>    
             </div>
         </div>
     </div>
         <div class="container-lg">
-            <div class="row justify-center">
+            <div class="row justify-center align-top">
                 <div class="col-md-10 text-center small">
                     <table class="table table-success table-hover table-bordered table-sm table-striped small">
                         <thead class="table-success">
@@ -69,36 +69,36 @@
                             <tr>
                                 <th scope="row">S&P 500</th>
                                 <td>20%</td>
-                                <td><input type="number" id="snp500ret" name="snp500ret" min="0" max="100" step="0.01" value="8.00"></td>
-                                <td><input type="number" id="snp500w" name="snp500w" min="0" max="100" step="1" value="20"></td>
+                                <td><input type="number" class="text-center" id="snp500ret" name="snp500ret" step="0.01" value="8.00"></td>                                  
+                                <td><input type="number" class="text-center" id="snp500w" min="0" max="100" name="snp500w" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-s&p"></td>
                             </tr>
                             <tr>
                                 <th scope="row">S&P TSX</th>
                                 <td>20%</td>
                                 <td id="conventional-hurdle-rate-s&ptsx"></td>
-                                <td><input type="number" id="w1" name="w1" min="0" max="100" step="1" value="20"></td>
+                                <td><input type="number" class="text-center" id="w1" name="w1" min="0" max="100" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-s&ptsx"></td>
                             </tr>
                             <tr>
                                 <th scope="row">EAFE Equities</th>
                                 <td>20%</td>
                                 <td id="conventional-hurdle-rate-eafe"></td>
-                                <td><input type="number" id="w2" name="w2" min="0" max="100" step="1" value="20"></td>
+                                <td><input type="number" class="text-center" id="w2" name="w2" min="0" max="100" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-eafe"></td>
                             </tr>
                             <tr>
                                 <th scope="row">Canadian Bond Universe</th>
                                 <td>40%</td>
                                 <td id="conventional-hurdle-rate-canadianbonds"></td>
-                                <td><input type="number" id="w3" name="w3" min="0" max="100" step="1" value="35"></td>
+                                <td><input type="number" class="text-center" id="w3" name="w3" min="0" max="100" step="1" value="35"></td>
                                 <td id="custom-hurdle-rate-canadianbonds"></td>
                             </tr>
                             <tr>
                                 <th scope="row">Canadian Apartments Reit</th>
                                 <td>0%</td>
                                 <td id="conventional-hurdle-rate-careit"></td>
-                                <td><input type="number" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
+                                <td><input type="number" class="text-center" id="w4" name="w4" min="0" max="100" step="1" value="5"></td>
                                 <td id="custom-hurdle-rate-careit"></td>
                             </tr>
                         </tbody>
@@ -112,55 +112,67 @@
                             </tr>
                         </tfoot>
                     </table>
-                    <a href="#sidebar" class="d-block mt-3" data-bs-toggle="offcanvas" role="button" aria-controls="sidebar">
-                        How this works (long version)
-                    </a>    
-                    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebar-label">
-                        <div class="offcanvas-header">
-                            <h5 class="offcanvas-title" id="sidebar-label">How this work (long version)</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                        </div>
-                        <div class="offcanvas-body">
-                            <p>
-                                This calculator follows the logic outlined in 
-                                <a href="https://www.amazon.ca/Modern-Investment-Management-Equilibrium-Approach/dp/0471124109">
-                                "Modern Investment Management: An Equilibrium Approach"</a> by Bob Litterman.
-                                It assumes that any assets in any "optimal" portfolio must have the same ratio
-                                of expected returns to marginal increase in risk ("ER/MCR" ratio). If this ratio is different
-                                for different assets, you can change the weight of any asset to increase total portfolio
-                                expected returns or portfolio risk.
-                            </p>
-                            <p>
-                                We back out the expected returns of particular assets in the portfolio by calculating the
-                                ER/MCR ratio for one asset (in this case S&P 500) with an assumed risk premium (in this case,
-                                5%; you can change this). Then we equalize the ER/MCR ratio for all assets, and back out
-                                their expected returns by multiplying those ratios by their individual MCR values.</p>
-                            <h4>Key Assumptions:</h4>
-                            <ul>
-                                <li>
-                                    You only care about returns and risk (standard deviation of risk) in an "optimal" 
-                                    portfolio
-                                </li>
-                                <li>
-                                    Recent historical returns (unweighted data from last 52 weeks) are adequte to estimate
-                                    marginal increase in portfolio risk
-                                </li>
-                                <li>
-                                    We can use the historical covariance matrix as the risk model to estimate marginal 
-                                    increase in portfolio risk
-                                </li>
-                                <li>
-                                    The initial expected return we supplied (S&P 500) is relatively accurate
-                                </li>
-                            </ul>
-                            <h4>Technologies used:</h4>
-                            <ul>
-                                <li><a href="https://github.com/wagenaartje/stocks.js">stock.js</a> to download securities data</li>
-                                <li><a href="https://github.com/compute-io/covariance">compute-covariance</a> to compute covariance matrices</li>
-                                <li><a href="https://mathjs.org/index.html">math.js</a> to perform matrix algebra</li>
-                            </ul>
-                            </div>
-                    </div>    
+                </div>    
+            </div>            
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" value="" id="noShorting">
+                <label class="form-check-label small" for="flexCheckDefault">
+                    No Shorting
+                </label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" value="" id="noLeverage">
+                <label class="form-check-label small" for="flexCheckDefault">
+                    No Leverage
+                </label>
+            </div>
+            <a href="#sidebar" class="d-block mt-2 small" data-bs-toggle="offcanvas" role="button" aria-controls="sidebar">
+                How this works (long version)
+            </a>    
+            <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebar-label">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="sidebar-label">How this work (long version)</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <p>
+                        This calculator follows the logic outlined in 
+                        <a href="https://www.amazon.ca/Modern-Investment-Management-Equilibrium-Approach/dp/0471124109">
+                        "Modern Investment Management: An Equilibrium Approach"</a> by Bob Litterman.
+                        It assumes that any assets in any "optimal" portfolio must have the same ratio
+                        of expected returns to marginal increase in risk ("ER/MCR" ratio). If this ratio is different
+                        for different assets, you can change the weight of any asset to increase total portfolio
+                        expected returns or portfolio risk.
+                    </p>
+                    <p>
+                        We back out the expected returns of particular assets in the portfolio by calculating the
+                        ER/MCR ratio for one asset (in this case S&P 500) with an assumed risk premium (in this case,
+                        5%; you can change this). Then we equalize the ER/MCR ratio for all assets, and back out
+                        their expected returns by multiplying those ratios by their individual MCR values.</p>
+                    <h4>Key Assumptions:</h4>
+                    <ul>
+                        <li>
+                            You only care about returns and risk (standard deviation of risk) in an "optimal" 
+                            portfolio
+                        </li>
+                        <li>
+                            Recent historical returns (unweighted data from last 52 weeks) are adequte to estimate
+                            marginal increase in portfolio risk
+                        </li>
+                        <li>
+                            We can use the historical covariance matrix as the risk model to estimate marginal 
+                            increase in portfolio risk
+                        </li>
+                        <li>
+                            The initial expected return we supplied (S&P 500) is relatively accurate
+                        </li>
+                    </ul>
+                    <h4>Technologies used:</h4>
+                    <ul>
+                        <li><a href="https://github.com/wagenaartje/stocks.js">stock.js</a> to download securities data</li>
+                        <li><a href="https://github.com/compute-io/covariance">compute-covariance</a> to compute covariance matrices</li>
+                        <li><a href="https://mathjs.org/index.html">math.js</a> to perform matrix algebra</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -180,18 +192,21 @@
         };
         var covmatMain = {};
         var remoteMat = {}
+        
+        const weightInputElements = [snp500w, w1, w2, w3, w4];
+
         const conventionalReturnElements = [
-                "conventional-hurdle-rate-s&ptsx",
-                "conventional-hurdle-rate-eafe",
-                "conventional-hurdle-rate-canadianbonds",
-                "conventional-hurdle-rate-careit"
+            "conventional-hurdle-rate-s&ptsx",
+            "conventional-hurdle-rate-eafe",
+            "conventional-hurdle-rate-canadianbonds",
+            "conventional-hurdle-rate-careit"
         ];
         const customReturnElements = [
-                "custom-hurdle-rate-s&p",
-                "custom-hurdle-rate-s&ptsx",
-                "custom-hurdle-rate-eafe",
-                "custom-hurdle-rate-canadianbonds",
-                "custom-hurdle-rate-careit"
+            "custom-hurdle-rate-s&p",
+            "custom-hurdle-rate-s&ptsx",
+            "custom-hurdle-rate-eafe",
+            "custom-hurdle-rate-canadianbonds",
+            "custom-hurdle-rate-careit"
         ];
 
         let weight = [0.2, 0.2, 0.2, 0.35, 0];
@@ -203,6 +218,25 @@
         .then(data=>{return data.json()})
         .then(data=>{remoteMat=math.matrix(data.data)})
         .then(res=>{console.log(res)})
+
+        //Remove min-max attributes to prevent resizing
+        for (var e of weightInputElements) {
+            e.removeAttribute("min");
+            e.removeAttribute("max");
+        };
+
+        const enforceConstraints = () => {
+            elements1 = conventionalReturnElements;
+            elements2 = customReturnElements;
+
+            if (noShorting.checked === true) {
+                for (var e in weightInputElements) {
+                    if (e.value <= 0) {
+                        e.value = 0;
+                    }
+                }
+            }
+        }
 
         const updateHurdle = () => {
             let weight = [0.2, 0.2, 0.2, 0.35, 0];
@@ -230,12 +264,12 @@
             covmatMain=matrix
             updateHurdle();
                         
-            snp500ret.addEventListener('change',updateHurdle)
-            snp500w.addEventListener('change',updateHurdle)
-            w1.addEventListener('change',updateHurdle)
-            w2.addEventListener('change',updateHurdle)
-            w3.addEventListener('change',updateHurdle)
-            w4.addEventListener('change',updateHurdle)
+            snp500ret.addEventListener('input',() => {updateHurdle();weightInputElements();})
+            snp500w.addEventListener('input',[updateHurdle,weightInputElements])
+            w1.addEventListener('input',updateHurdle)
+            w2.addEventListener('input',updateHurdle)
+            w3.addEventListener('input',updateHurdle)
+            w4.addEventListener('input',updateHurdle)
         })
 
     </script>
