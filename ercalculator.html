@@ -6,9 +6,9 @@
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" >
+    <link href="./resources/css/input.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" ></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
-    
     <script src="./resources/js/stocks.js"></script>
     <script src="./resources/js/bundle.js"></script>
     <script src="./resources/js/math.js"></script>
@@ -69,36 +69,36 @@
                             <tr>
                                 <th scope="row">S&P 500</th>
                                 <td>20%</td>
-                                <td><input type="number" class="text-center" id="snp500ret" min="0" max="100" name="snp500ret" step="0.01" value="8.00"></td>                                  
-                                <td><input type="number" class="text-center" id="snp500w" min="0" max="100" name="snp500w" step="1" value="20"></td>
+                                <td><input type="number" class="text-center" id="snp500ret" name="snp500ret" step="0.01" value="8.00"></td>                                  
+                                <td><input type="number" class="text-center" id="snp500w" name="snp500w" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-s&p"></td>
                             </tr>
                             <tr>
                                 <th scope="row">S&P TSX</th>
                                 <td>20%</td>
                                 <td id="conventional-hurdle-rate-s&ptsx"></td>
-                                <td><input type="number" class="text-center" id="w1" name="w1" min="0" max="100" step="1" value="20"></td>
+                                <td><input type="number" class="text-center" id="w1" name="w1" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-s&ptsx"></td>
                             </tr>
                             <tr>
                                 <th scope="row">EAFE Equities</th>
                                 <td>20%</td>
                                 <td id="conventional-hurdle-rate-eafe"></td>
-                                <td><input type="number" class="text-center" id="w2" name="w2" min="0" max="100" step="1" value="20"></td>
+                                <td><input type="number" class="text-center" id="w2" name="w2" step="1" value="20"></td>
                                 <td id="custom-hurdle-rate-eafe"></td>
                             </tr>
                             <tr>
                                 <th scope="row">Canadian Bond Universe</th>
                                 <td>40%</td>
                                 <td id="conventional-hurdle-rate-canadianbonds"></td>
-                                <td><input type="number" class="text-center fixed" id="w3" min="0" max="100" name="w3" step="1" value="35"></td>
+                                <td><input type="number" class="text-center fixed" id="w3" name="w3" step="1" value="35"></td>
                                 <td id="custom-hurdle-rate-canadianbonds"></td>
                             </tr>
                             <tr>
                                 <th scope="row">Canadian Apartments Reit</th>
                                 <td>0%</td>
                                 <td id="conventional-hurdle-rate-careit"></td>
-                                <td><input type="number" class="text-center" id="w4" name="w4" size="3" min="0" max="100" step="1" value="5"></td>
+                                <td><input type="number" class="text-center" id="w4" name="w4" size="3" step="1" value="5"></td>
                                 <td id="custom-hurdle-rate-careit"></td>
                             </tr>
                         </tbody>
@@ -213,20 +213,11 @@
         let customWeight = [snp500w.value/100, w1.value/100, w2.value/100, w3.value/100, w4.value/100];        
 
         //Fetch static covariance matrix from API
-        const url='https://deploy-back-end-example.herokuapp.com/matrix'
+        const url='https://etf-matrix-server.herokuapp.com/matrix'
         fetch(url)
         .then(data=>{return data.json()})
         .then(data=>{remoteMat=math.matrix(data.data)})
         .then(res=>{console.log(res)})
-
-        //Remove min-max attributes to prevent resizing
-        //snp500ret.removeAttribute("min")
-        //snp500ret.removeAttribute("max")
-        
-        for (var e of weightInputElements) {
-         //   e.removeAttribute("min");
-          //  e.removeAttribute("max");
-        };
 
         const enforceConstraints = () => {
             elements1 = conventionalReturnElements;
